@@ -18,7 +18,7 @@ const db = mysql.createConnection(
     
     password: 'Y3400$00141b'
   },
-  console.log(`Connected to the classlist_db database.`)
+  console.log(`Connected to the employees_db database.`)
 );
 
 
@@ -36,7 +36,7 @@ db.query('SELECT * FROM employee', function (err, results) {
 
 function addEmployee (employee){
 const sql = `INSERT INTO employee SET ?`
-  const employee = {
+  employee = {
       first_name: "",
       last_name: ""
     }
