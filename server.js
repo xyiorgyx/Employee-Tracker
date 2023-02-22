@@ -1,4 +1,5 @@
 const express = require('express');
+const inquirer = require('inquirer');
 // Import and require mysql2
 const mysql = require('mysql2');
 const cTable = require('console.table');
@@ -20,19 +21,59 @@ const db = mysql.createConnection(
   },
   console.log(`Connected to the employees_db database.`)
 );
+const choices =['Show All Employees','Add Employee','Update Employee Role','View All Roles', 'Add Role', 'View All Departments','Add Department']
+
+async function init() {
+  await inquirer .prompt([
+    {
+      type: 'list',
+      message: 'What can I do for you?',
+      name: 'userChoice',
+      choices: choices
+    },
+  ])
+  .then((response) => caseFunction(response))
+  .catch((err) => console.error(err));
+}
+init();
 
 
-db.query('SELECT * FROM department', function (err, results) {
-  console.table(results);
-});
+switch (response){
+    case 'Show All Employees':
+      db.query('SELECT * FROM employee', function (err, results) {
+        console.table(results);
+      });
+    break;
+    case 'Add Employee':
+    addEmployee()
+    break;
+    case 'Update Employee Role':
+    updateEmployee()
+    break;
+    case 'View All Roles':
+      db.query('SELECT * FROM role', function (err, results) {
+        console.table(results);
+      });
+    break;
+    case 'Add Role':
+    addRoll();
+    break;
+    case 'View All Departments':
+      db.query('SELECT * FROM department', function (err, results) {
+        console.table(results);
+      });
+    break;
+    case 'Add Department':
+    addDepartments()
+    break;
+    default:
+    init()
+}
 
-db.query('SELECT * FROM role', function (err, results) {
-  console.table(results);
-});
 
-db.query('SELECT * FROM employee', function (err, results) {
-  console.table(results);
-});
+
+
+
 
 function addEmployee (employee){
 const sql = `INSERT INTO employee SET ?`
