@@ -24,7 +24,7 @@ const db = mysql.createConnection(
 const choices =['Show All Employees','Add Employee','Update Employee Role','View All Roles', 'Add Role', 'View All Departments','Add Department']
 
 async function init() {
-  await inquirer .prompt([
+  await inquirer.prompt([
     {
       type: 'list',
       message: 'What can I do for you?',
@@ -45,7 +45,9 @@ switch (response){
       });
     break;
     case 'Add Employee':
-    addEmployee()
+    async function inquirerEmployee([
+      
+    ])
     break;
     case 'Update Employee Role':
     updateEmployee()
@@ -56,7 +58,28 @@ switch (response){
       });
     break;
     case 'Add Role':
-    addRoll();
+      async function queryRole(){
+        await inquirer.prompt([
+          {
+            type: 'input',
+            message: 'What will be the name of this Role?',
+            name: role_name,
+          },
+          {
+            type: 'input',
+            message: 'What will be the salary of this Role?',
+            name: role_salary,
+          },
+          {
+            type: 'input',
+            message: 'Which department does this rold belong to?',
+            name: department,
+          },
+        
+        ])
+        .then((response) => addRole(response))
+  .catch((err) => console.error(err));
+        };
     break;
     case 'View All Departments':
       db.query('SELECT * FROM department', function (err, results) {
@@ -64,16 +87,51 @@ switch (response){
       });
     break;
     case 'Add Department':
-    addDepartments()
+    async function queryDepartments(){
+      await inquirer.prompt([
+        {
+          type: 'input',
+          message: 'What will be the name of this Role?',
+          name: role_name,
+        },
+        {
+          type: 'input',
+          message: 'What will be the salary of this Role?',
+          name: role_salary,
+        },
+        {
+          type: 'input',
+          message: 'Which department does this rold belong to?',
+          name: department,
+        },
+        
+      ])
+    }
     break;
     default:
     init()
 }
 
 
-
-
-
+function addRole(){
+  const sql = `INSERT INTO role SET ?`
+  role = {
+      role_name: "",
+      role_salary: "",
+      department: "",
+    }
+  
+  db.query(sql, role, (err, result) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({
+      message: 'success',
+      data: body
+    });
+  });
+}
 
 function addEmployee (employee){
 const sql = `INSERT INTO employee SET ?`
@@ -93,17 +151,6 @@ const sql = `INSERT INTO employee SET ?`
     });
   });
 }
-
-db.query(`DELETE FROM employee WHERE id = ?`, 3, (err, result) => {
-  if (err) {
-    console.log(err);
-  }
-  console.log(result);
-});
-
-db.query('SELECT * FROM course_names', function (err, results) {
-  console.log(results);
-});
 
 
 
