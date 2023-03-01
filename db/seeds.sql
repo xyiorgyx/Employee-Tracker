@@ -12,18 +12,18 @@ VALUES ("Lead sales Representative", 70000, 1),
        ("Graphic Artist", 85000, 2),
        ("Advertising Copywriter", 90000, 2),
        ("Art Director", 55000 ,2 ),
-       ("Therapist", 65000, 3);
+       ("Therapist", 65000, 3),
        ("Negotiator", 20000 ,3 ),
-       ("Financial Analyst", 90000, 4);
-       ("Portfolio Manager", 120000, 4 ),
+       ("Financial Analyst", 90000, 4),
+       ("Portfolio Manager", 120000, 4 );
        
 
-  INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ("Ryan", "Reynolds",4,3 ),
-       ("Denzel", "Washington",10,3 ),
+INSERT INTO employee (first_name, last_name, role_id, manager_id)
+VALUES ("Ryan", "Reynolds", 4, 3 ),
+       ("Denzel", "Washington", 10, 3 ),
        ("Dwayne","Johnson", 1, null),
        ("Jenna", "Ortega", 8, null ),
-       ("Johny","Depp", 5,4),
+       ("Johny","Depp", 5, 4),
        ("Keanu", "Reeves", 2, 4),
        ("Ana", "De Armas",3,3);
   

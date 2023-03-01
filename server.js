@@ -2,7 +2,6 @@ const express = require('express');
 const inquirer = require('inquirer');
 // Import and require mysql2
 const mysql = require('mysql2');
-const cTable = require('console.table');
 const PORT = process.env.PORT || 3001;
 const app = express();
 
@@ -56,6 +55,7 @@ async function askFirstQuestion() {
       case 'View All Departments':
         db.query('SELECT * FROM department', function (err, results) {
           console.table(results);
+          
         });
         break;
       case 'Add Department':
@@ -64,17 +64,17 @@ async function askFirstQuestion() {
             {
               type: 'input',
               message: 'What will be the name of this Role?',
-              name: role_name,
+              name: 'role_name',
             },
             {
               type: 'input',
               message: 'What will be the salary of this Role?',
-              name: role_salary,
+              name: 'role_salary',
             },
             {
               type: 'input',
               message: 'Which department does this rold belong to?',
-              name: department,
+              name: 'department',
             },
 
           ])
@@ -95,7 +95,7 @@ askFirstQuestion();
 
 function showAllEmployees() {
   db.query('SELECT * FROM employee', function (err, results) {
-    console.table(results);
+    console.log(results);
   });
 }
 
