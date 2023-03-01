@@ -14,114 +14,117 @@ app.use(express.json());
 const db = mysql.createConnection(
   {
     host: 'localhost',
-   
+
     user: 'root',
-    
-    password: 'Y3400$00141b'
-  },
-  console.log(`Connected to the employees_db database.`)
+
+    password: 'Y3400$00141b',
+    database: 'employees_db'
+  }
 );
-const choices =['Show All Employees','Add Employee','Update Employee Role','View All Roles', 'Add Role', 'View All Departments','Add Department']
 
-async function init() {
-  await inquirer.prompt([
-    {
-      type: 'list',
-      message: 'What can I do for you?',
-      name: 'userChoice',
-      choices: choices
-    },
-  ])
-  .then((response) => caseFunction(response))
-  .catch((err) => console.error(err));
-}
-init();
+const choices = ['Show All Employees', 'Add Employee', 'Update Employee Role', 'View All Roles', 'Add Role', 'View All Departments', 'Add Department']
 
-
-switch (response){
-    case 'Show All Employees':
-      db.query('SELECT * FROM employee', function (err, results) {
-        console.table(results);
-      });
-    break;
-    case 'Add Employee':
-    async function inquirerEmployee([
-      
+async function askFirstQuestion() {
+  try {
+    const response = await inquirer.prompt([
+      {
+        type: 'list',
+        message: 'What can I do for you?',
+        name: 'userChoice',
+        choices: choices
+      },
     ])
-    break;
-    case 'Update Employee Role':
-    updateEmployee()
-    break;
-    case 'View All Roles':
-      db.query('SELECT * FROM role', function (err, results) {
-        console.table(results);
-      });
-    break;
-    case 'Add Role':
-      async function queryRole(){
-        await inquirer.prompt([
-          {
-            type: 'input',
-            message: 'What will be the name of this Role?',
-            name: role_name,
-          },
-          {
-            type: 'input',
-            message: 'What will be the salary of this Role?',
-            name: role_salary,
-          },
-          {
-            type: 'input',
-            message: 'Which department does this rold belong to?',
-            name: department,
-          },
-        
-        ])
-        .then((response) => addRole(response))
-  .catch((err) => console.error(err));
-        };
-    break;
-    case 'View All Departments':
-      db.query('SELECT * FROM department', function (err, results) {
-        console.table(results);
-      });
-    break;
-    case 'Add Department':
-    async function queryDepartments(){
-      await inquirer.prompt([
-        {
-          type: 'input',
-          message: 'What will be the name of this Role?',
-          name: role_name,
-        },
-        {
-          type: 'input',
-          message: 'What will be the salary of this Role?',
-          name: role_salary,
-        },
-        {
-          type: 'input',
-          message: 'Which department does this rold belong to?',
-          name: department,
-        },
-        
-      ])
+
+    switch (response.userChoice) {
+      case 'Show All Employees':
+        await showAllEmployees();
+        break;
+      case 'Add Employee':
+
+        break;
+      case 'Update Employee Role':
+        await updateEmployee()
+        break;
+      case 'View All Roles':
+        db.query('SELECT * FROM role', function (err, results) {
+          console.table(results);
+        });
+        break;
+      case 'Add Role':
+        addRole();
+        break;
+      case 'View All Departments':
+        db.query('SELECT * FROM department', function (err, results) {
+          console.table(results);
+        });
+        break;
+      case 'Add Department':
+        async function queryDepartments() {
+          await inquirer.prompt([
+            {
+              type: 'input',
+              message: 'What will be the name of this Role?',
+              name: role_name,
+            },
+            {
+              type: 'input',
+              message: 'What will be the salary of this Role?',
+              name: role_salary,
+            },
+            {
+              type: 'input',
+              message: 'Which department does this rold belong to?',
+              name: department,
+            },
+
+          ])
+        }
+        break;
+      default:
+        askFirstQuestion()
     }
-    break;
-    default:
-    init()
+
+  } catch (err) {
+    console.log(err)
+  }
+}
+askFirstQuestion();
+
+
+
+
+function showAllEmployees() {
+  db.query('SELECT * FROM employee', function (err, results) {
+    console.table(results);
+  });
 }
 
+async function addRole() {
 
-function addRole(){
+  const [departments] = db.promise().query("SELECT * FROM departments")
+
+  const response = await inquirer.prompt([
+    {
+      type: 'input',
+      message: 'What will be the name of this Role?',
+      name: "role_name",
+    },
+    {
+      type: 'input',
+      message: 'What will be the salary of this Role?',
+      name: "role_salary",
+    },
+    {
+      type: 'input',
+      message: 'Which department does this rold belong to?',
+      name: "department",
+    },
+
+  ])
+
   const sql = `INSERT INTO role SET ?`
-  role = {
-      role_name: "",
-      role_salary: "",
-      department: "",
-    }
-  
-  db.query(sql, role, (err, result) => {
+
+  db.query(sql, response, (err, result) => {
     if (err) {
       res.status(400).json({ error: err.message });
       return;
@@ -133,13 +136,13 @@ function addRole(){
   });
 }
 
-function addEmployee (employee){
-const sql = `INSERT INTO employee SET ?`
+function addEmployee(employee) {
+  const sql = `INSERT INTO employee SET ?`
   employee = {
-      first_name: "",
-      last_name: ""
-    }
-  
+    first_name: "",
+    last_name: ""
+  }
+
   db.query(sql, employee, (err, result) => {
     if (err) {
       res.status(400).json({ error: err.message });
