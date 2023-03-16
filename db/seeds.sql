@@ -19,11 +19,11 @@ VALUES ("Lead sales Representative", 70000, 1),
        
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ("Ryan", "Reynolds", 4, 3 ),
-       ("Denzel", "Washington", 10, 3 ),
-       ("Dwayne","Johnson", 1, null),
-       ("Jenna", "Ortega", 8, null ),
+VALUES ("Ryan", "Reynolds", 4, null),
+       ("Denzel", "Washington", 8, null ),
+       ("Dwayne","Johnson", 1, 1),
+       ("Jenna", "Ortega", 4, 2),
        ("Johny","Depp", 5, 4),
        ("Keanu", "Reeves", 2, 4),
-       ("Ana", "De Armas",3,3);
+       ("Ana", "De Armas",3, 3);
   

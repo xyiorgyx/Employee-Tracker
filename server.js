@@ -10,16 +10,15 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 // Connect to database
-const db = mysql.createConnection(
-  {
-    host: 'localhost',
-
-    user: 'root',
-
-    password: 'Y3400$00141b',
-    database: 'employees_db'
-  }
-);
+const sequelize = process.env.JAWSDB_URL
+  ? new Sequelize(process.env.JAWSDB_URL)
+  : new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PW, {
+      host: 'localhost',
+      dialect: 'mysql',
+      dialectOptions: {
+        decimalNumbers: true,
+      },
+    });
 
 const choices = ['Show All Employees', 'Add Employee', 'Update Employee Role', 'View All Roles', 'Add Role', 'View All Departments', 'Add Department']
 
@@ -59,26 +58,7 @@ async function askFirstQuestion() {
         });
         break;
       case 'Add Department':
-        async function queryDepartments() {
-          await inquirer.prompt([
-            {
-              type: 'input',
-              message: 'What will be the name of this Role?',
-              name: 'role_name',
-            },
-            {
-              type: 'input',
-              message: 'What will be the salary of this Role?',
-              name: 'role_salary',
-            },
-            {
-              type: 'input',
-              message: 'Which department does this rold belong to?',
-              name: 'department',
-            },
-
-          ])
-        }
+        queryDepartments();
         break;
       default:
         askFirstQuestion()
@@ -90,8 +70,26 @@ async function askFirstQuestion() {
 }
 askFirstQuestion();
 
+async function queryDepartments() {
+  await inquirer.prompt([
+    {
+      type: 'input',
+      message: 'What will be the name of this Role?',
+      name: 'role_name',
+    },
+    {
+      type: 'input',
+      message: 'What will be the salary of this Role?',
+      name: 'role_salary',
+    },
+    {
+      type: 'input',
+      message: 'Which department does this role belong to?',
+      name: 'department',
+    },
 
-
+  ])
+}
 
 function showAllEmployees() {
   db.query('SELECT * FROM employee', function (err, results) {
