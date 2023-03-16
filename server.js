@@ -21,7 +21,7 @@ const sequelize = process.env.JAWSDB_URL
     });
 
 const choices = ['Show All Employees', 'Add Employee', 'Update Employee Role', 'View All Roles', 'Add Role', 'View All Departments', 'Add Department']
-
+// will ask what the user wants to do, with many choices comes additionla queries.
 async function askFirstQuestion() {
   try {
     const response = await inquirer.prompt([
@@ -70,6 +70,7 @@ async function askFirstQuestion() {
 }
 askFirstQuestion();
 
+
 async function queryDepartments() {
   await inquirer.prompt([
     {
@@ -90,13 +91,13 @@ async function queryDepartments() {
 
   ])
 }
-
+// Will show alll employees currently within the data base
 function showAllEmployees() {
   db.query('SELECT * FROM employee', function (err, results) {
     console.log(results);
   });
 }
-
+// Will query about the role including, the name, salary and department
 async function addRole() {
 
   const [departments] = db.promise().query("SELECT * FROM departments")
@@ -117,9 +118,8 @@ async function addRole() {
       message: 'Which department does this rold belong to?',
       name: "department",
     },
-
   ])
-
+// inserts information into the database 
   const sql = `INSERT INTO role SET ?`
 
   db.query(sql, response, (err, result) => {
@@ -133,7 +133,7 @@ async function addRole() {
     });
   });
 }
-
+// adds the emplopyee based on the information provided.
 function addEmployee(employee) {
   const sql = `INSERT INTO employee SET ?`
   employee = {
@@ -154,7 +154,7 @@ function addEmployee(employee) {
 }
 
 
-
+// connection to database and server.
 app.use((req, res) => {
   res.status(404).end();
 });
