@@ -4,23 +4,26 @@ const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const PORT = process.env.PORT || 3001;
 const app = express();
+require ("console.table")
 
 // Express middleware
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-// Connect to database
-const sequelize = process.env.JAWSDB_URL
-  ? new Sequelize(process.env.JAWSDB_URL)
-  : new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PW, {
-      host: 'localhost',
-      dialect: 'mysql',
-      dialectOptions: {
-        decimalNumbers: true,
-      },
-    });
+const db = mysql.createConnection(
+  {
+    host: 'localhost',
+    // MySQL username,
+    user: 'root',
+    // MySQL password
+    password: 'Y3400$00141b',
+    database: 'employees_db'
+  },
+  console.log(`Connected to the courses_db database.`)
+);
 
-const choices = ['Show All Employees', 'Add Employee', 'Update Employee Role', 'View All Roles', 'Add Role', 'View All Departments', 'Add Department']
+
+const choices = ['Show All Employees', 'Add Employee', 'Update Employee Role', 'View All Roles', 'Add Role', 'View All Departments', 'Add Department', 'exit']
 // will ask what the user wants to do, with many choices comes additionla queries.
 async function askFirstQuestion() {
   try {
@@ -38,85 +41,74 @@ async function askFirstQuestion() {
         await showAllEmployees();
         break;
       case 'Add Employee':
-
+    await addEmployee()
         break;
       case 'Update Employee Role':
         await updateEmployee()
         break;
       case 'View All Roles':
-        db.query('SELECT * FROM role', function (err, results) {
-          console.table(results);
-        });
+       await showAllRoles()
         break;
       case 'Add Role':
-        addRole();
+        await addRole();
         break;
       case 'View All Departments':
-        db.query('SELECT * FROM department', function (err, results) {
-          console.table(results);
-          
-        });
+        await showAllDepartments();
         break;
       case 'Add Department':
-        queryDepartments();
+       await queryDepartments();
         break;
       default:
-        askFirstQuestion()
+        return
     }
-
+askFirstQuestion();
   } catch (err) {
     console.log(err)
   }
 }
 askFirstQuestion();
 
-
-async function queryDepartments() {
-  await inquirer.prompt([
-    {
-      type: 'input',
-      message: 'What will be the name of this Role?',
-      name: 'role_name',
-    },
-    {
-      type: 'input',
-      message: 'What will be the salary of this Role?',
-      name: 'role_salary',
-    },
-    {
-      type: 'input',
-      message: 'Which department does this role belong to?',
-      name: 'department',
-    },
-
-  ])
+//Will show all departments within the database
+async function showAllDepartments(){
+  const [departments] = await db.promise().query('SELECT * FROM department'); 
+    console.table(departments);
 }
+
+// Will show all roles in the database
+async function showAllRoles() {
+ const [roles] = await db.promise().query('SELECT * FROM role'); 
+console.table(roles);
+}
+
 // Will show alll employees currently within the data base
-function showAllEmployees() {
-  db.query('SELECT * FROM employee', function (err, results) {
-    console.log(results);
-  });
+async function showAllEmployees() {
+  const [employees] = await db.promise().query('SELECT * FROM employee'); 
+    console.table(employees);
 }
+
 // Will query about the role including, the name, salary and department
 async function addRole() {
 
-  const [departments] = db.promise().query("SELECT * FROM departments")
-
+  const [departments] = await db.promise().query("SELECT * FROM department")
+  const deptChoices = departments.map(({name, id}) => {
+    return {name, value: id}
+  })
   const response = await inquirer.prompt([
     {
       type: 'input',
       message: 'What will be the name of this Role?',
-      name: "role_name",
+      name: "title",
     },
     {
       type: 'input',
       message: 'What will be the salary of this Role?',
-      name: "role_salary",
+      name: "salary",
     },
     {
-      type: 'input',
+      type: 'list',
       message: 'Which department does this rold belong to?',
-      name: "department",
+      name: "department_id",
+      choices: deptChoices
     },
   ])
 // inserts information into the database 
@@ -124,41 +116,59 @@ async function addRole() {
 
   db.query(sql, response, (err, result) => {
     if (err) {
-      res.status(400).json({ error: err.message });
+      console.log(err.message)
       return;
     }
-    res.json({
-      message: 'success',
-      data: body
-    });
   });
 }
-// adds the emplopyee based on the information provided.
-function addEmployee(employee) {
-  const sql = `INSERT INTO employee SET ?`
-  employee = {
-    first_name: "",
-    last_name: ""
-  }
 
+// adds the emplopyee based on the information provided.
+async function addEmployee() {
+
+  const [roles] = await db.promise().query("SELECT * FROM role")
+  const roleChoices = roles.map(({title, id}) => {
+    return {name: title, value: id}
+  })
+
+  const [managers] = await db.promise().query("SELECT * FROM employee")
+  const managerChoices = managers.map(({first_name, last_name, id}) => {
+    return {name: `${first_name} ${last_name}`, value: id}
+  })
+  const employee = await inquirer.prompt([
+    {
+      type: 'input',
+      message: 'What is the first name of your employee?',
+      name: "first_name",
+    },
+    {
+      type: 'input',
+      message: 'What is the employees last name?',
+      name: "last_name",
+    },
+    {
+      type: 'list',
+      message: 'Which role would you like to assign this employee',
+      name: "role_id",
+      choices: roleChoices
+    },
+    {
+      type: 'list',
+      message: 'Which manager would you like to assign this employee',
+      name: "manager_id",
+      choices: managerChoices
+    },
+  
+  ])
+
+
+  const sql = `INSERT INTO employee SET ?`
+ 
   db.query(sql, employee, (err, result) => {
     if (err) {
-      res.status(400).json({ error: err.message });
+      console.log(err.message)
       return;
     }
-    res.json({
-      message: 'success',
-      data: body
-    });
   });
 }
 
 
-// connection to database and server.
-app.use((req, res) => {
-  res.status(404).end();
-});
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
