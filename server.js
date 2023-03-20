@@ -2,7 +2,6 @@ const express = require('express');
 const inquirer = require('inquirer');
 // Import and require mysql2
 const mysql = require('mysql2');
-const PORT = process.env.PORT || 3001;
 const app = express();
 require ("console.table")
 
@@ -16,7 +15,7 @@ const db = mysql.createConnection(
     // MySQL username,
     user: 'root',
     // MySQL password
-    password: '1234',
+    password: 'Y3400$00141b',
     database: 'employees_db'
   },
   console.log(`Connected to the courses_db database.`)
@@ -44,7 +43,7 @@ async function askFirstQuestion() {
     await addEmployee()
         break;
       case 'Update Employee Role':
-        await updateEmployee()
+        await updateEmployeeRole()
         break;
       case 'View All Roles':
        await showAllRoles()
@@ -68,6 +67,9 @@ askFirstQuestion();
 }
 askFirstQuestion();
 
+
+
+
 //Will show all departments within the database
 async function showAllDepartments(){
   const [departments] = await db.promise().query('SELECT * FROM department'); 
@@ -86,6 +88,44 @@ async function showAllEmployees() {
     console.table(employees);
 }
 
+async function updateEmployeeRole(){
+  const [employees] = await db.promise().query("SELECT * FROM employee")
+  const employeeChoices = employees.map(({name, id}) => {
+    return {name: `${first_name} ${last_name}`, value: id}
+  })
+  const [roles] = await db.promise().query("SELECT * FROM role")
+  const roleChoices = roles.map(({title, value: id}) => {
+    return {title, value: id}
+  })
+  const response = await inquirer.prompt([
+    {
+      type: 'list',
+      message: 'Which employee would you like to update?',
+      name: "employee_id",
+      choices: employeeChoices
+    },
+    {
+      type: 'input',
+      message: 'Choose a new role for this employee',
+      name: "role_id",
+      choices: roleChoices
+    },
+    {
+      type: 'list',
+      message: '',
+      name: "department_id",
+      choices: deptChoices
+    },
+  ])
+  const sql = `UPDATE INTO role SET employee_id`
+
+  db.query(sql, response, (err, result) => {
+    if (err) {
+      console.log(err.message)
+      return;
+    }
+  });
+}
 // Will query about the role including, the name, salary and department
 async function addRole() {
 
