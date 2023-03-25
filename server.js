@@ -213,7 +213,7 @@ async function addDepartment(){
     {
       type: 'input',
       message: 'What will be the name of this department?',
-      name: "title",
+      name: "name",
     },
   ])
 // inserts information into the database 
