@@ -6,4 +6,10 @@ Employee tracker allows a user to add data about their employees, including: Sal
 
 ## Instructions
 
-Simply begin with an NPM I in the intergrated terminal in the server file. Seed the data as shown in the video below. After which the user will add 
+Click on this [link]() to watch a tutorial video
+
+## Purpose
+
+The purpose of this program is to allow users to create departmentrs, roles, and add employees to easily and effectivly store large amounts of data for a company or small business. 
+
+## github link

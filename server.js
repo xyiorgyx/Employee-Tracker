@@ -98,7 +98,7 @@ async function updateEmployeeRole(){
   const roleChoices = roles.map(({title, id}) => {
     return {name: `${title}`, value: id}
   })
-  const response = await inquirer.prompt([
+  const { employee_id, role_id } = await inquirer.prompt([
     {
       type: 'list',
       message: 'Which employee would you like to update?',
@@ -111,11 +111,13 @@ async function updateEmployeeRole(){
       name: "role_id",
       choices: roleChoices
     },
-  
-  ])
-  const sql = "UPDATE employee SET role_id WHERE ?"
 
-  db.query(sql, response, (err, result) => {
+  ])
+
+
+  const sql = "UPDATE employee SET role_id = ? WHERE id = ?"
+
+  db.query(sql, [role_id, employee_id], (err, result) => {
     if (err) {
       console.log(err.message)
       return;
