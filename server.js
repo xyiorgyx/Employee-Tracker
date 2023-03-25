@@ -55,7 +55,7 @@ async function askFirstQuestion() {
         await showAllDepartments();
         break;
       case 'Add Department':
-       await queryDepartments();
+       await addDepartment();
         break;
       default:
         return
@@ -114,8 +114,7 @@ async function updateEmployeeRole(){
 
   ])
 
-
-  const sql = "UPDATE employee SET role_id = ? WHERE id = ?"
+ const sql = "UPDATE employee SET role_id = ? WHERE id = ?"
 
   db.query(sql, [role_id, employee_id], (err, result) => {
     if (err) {
@@ -209,4 +208,21 @@ async function addEmployee() {
   });
 }
 
+async function addDepartment(){
+  const response = await inquirer.prompt([
+    {
+      type: 'input',
+      message: 'What will be the name of this department?',
+      name: "title",
+    },
+  ])
+// inserts information into the database 
+  const sql = `INSERT INTO department SET ?`
 
+  db.query(sql, response, (err, result) => {
+    if (err) {
+      console.log(err.message)
+      return;
+    }
+  });
+}
