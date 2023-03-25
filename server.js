@@ -88,14 +88,15 @@ async function showAllEmployees() {
     console.table(employees);
 }
 
+//update employees role
 async function updateEmployeeRole(){
   const [employees] = await db.promise().query("SELECT * FROM employee")
-  const employeeChoices = employees.map(({name, id}) => {
+  const employeeChoices = employees.map(({first_name, last_name, id}) => {
     return {name: `${first_name} ${last_name}`, value: id}
   })
   const [roles] = await db.promise().query("SELECT * FROM role")
-  const roleChoices = roles.map(({title, value: id}) => {
-    return {title, value: id}
+  const roleChoices = roles.map(({title, id}) => {
+    return {name: `${title}`, value: id}
   })
   const response = await inquirer.prompt([
     {
@@ -105,19 +106,14 @@ async function updateEmployeeRole(){
       choices: employeeChoices
     },
     {
-      type: 'input',
+      type: 'list',
       message: 'Choose a new role for this employee',
       name: "role_id",
       choices: roleChoices
     },
-    {
-      type: 'list',
-      message: '',
-      name: "department_id",
-      choices: deptChoices
-    },
+  
   ])
-  const sql = `UPDATE INTO role SET employee_id`
+  const sql = "UPDATE employee SET role_id WHERE ?"
 
   db.query(sql, response, (err, result) => {
     if (err) {
@@ -146,7 +142,7 @@ async function addRole() {
     },
     {
       type: 'list',
-      message: 'Which department does this rold belong to?',
+      message: 'Which department does this role belong to?',
       name: "department_id",
       choices: deptChoices
     },
